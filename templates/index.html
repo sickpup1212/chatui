@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flask SocketIO Example</title>
+    <script src="https://unpkg.com/htmx.org@1.6.1/dist/htmx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" >
+    <script src="{{ url_for('static', filename='prismjs.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='prismcss.css') }}" >
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alasql/4.5.0/alasql.min.js" integrity="sha512-/fluDd6CXLNHVYFiyUuj9vv913ThYlamWHCdj4B8hpg1znp8Kf8v3ihXWBSF+YXw9IOXvm5mPUrs1Iiw/Gzfrg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+
+#li2,#span1{background-color:#fff}#li2:hover,.selected{background-color:#f0f0f0}*,::after,::before{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji'}button{background-color:transparent;background-image:none}li,ul{list-style:none;margin:0;padding:0}[role=button],button{cursor:pointer}#ul1{display:flex;text-align:center;border-bottom-width:1px;border-bottom-color:#e2e8f0}.selected{position:relative;border-top-width:1px;border-left-width:1px;border-right-width:1px;border-color:#e2e8f0}#span1{position:absolute;left:0;right:0;height:1px;bottom:-1px}#li2{flex:1}.a2{display:block;padding:1rem;font-size:1rem;font-weight:500;color:#4b5563}a.selected{text-decoration:underline}a{text-decoration:none}.tabarea{border-top:1px solid #000;padding:8px}.outercont{border:2px solid #000;width:90vw;height:90vh;overflow:scroll;border-radius:12px;top-margin:50%}.hide{display:none}.show{display:block}
+</style>
+
+</head>
+<body>
+<center>
+<div class="outercont">
+<ul id="ul1" class="tab-container">
+   <li id="li2"> <a class="tab a2 selected" href="#" data-tabpage="Assistant_tab">Assistants</a> </li>
+   <li id="li2"> <a class="tab a2" href="#" data-tabpage="Messages_tab">Messages</a> </li>
+   <li id="li2"> <a class="tab a2" href="#" data-tabpage="Threads_tab">Threads</a> </li>
+   <li id="li2"> <a class="tab a2" href="#" data-tabpage="Runs_tab">Runs</a> </li>
+</ul>
+
+
+  <div id="Assistant_tab" class="tabarea">
+    <div class="asstcontainer">
+    
+      <div id="status"></div>
+
+
+      <div class="ilene">
+        <div id="ass" class="flex-center">
+          <p>current assistant: &nbsp;&nbsp;&nbsp; </p>
+          <input id="asstIDHolder">
+        </div>
+        <div id="tee" class="flex-center">
+          <p>current thread: &nbsp;&nbsp;&nbsp;</p>
+          <input id="threadHolder">
+          <button id="newThread">clear get new thread</button>
+        </div>
+      </div>
+      <div id="assistantCurrently"></div>
+
+      <div id="messages"></div>
+
+      <form id="messageForm">
+        <textarea type="text" id="messageInput" placeholder="Enter your message"></textarea>
+        <button type="submit">Send</button>
+      </form>
+
+    </div>
+  </div>
+  <div id="Messages_tab" class="tabarea hide">
+    <table id="assistantTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Created At</th>
+          <th>Description</th>
+          <th>Instructions</th>
+          <th>Model</th>
+          <th>Name</th>
+          <th>Tools</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div id="Threads_tab" class="tabarea hide">
+        <table id="autoTable" border="1">
+        <thead>
+            <tr>
+                <th>Old Thread</th>
+                <th>Old Messages</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script>
+function updateThreadsTable() {
+    var data = alasql('SELECT * FROM threads');
+    var tbody = document.querySelector('#autoTable tbody');
+    tbody.innerHTML = ''; // Clear existing rows
+
+    data.forEach(function(row) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + row.oldThread + '</td><td>' + row.oldMessages + '</td>';
+        tbody.appendChild(tr);
+    });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize alasql with localStorage
+    alasql('CREATE localStorage DATABASE IF NOT EXISTS ThreadDB');
+    alasql('ATTACH localStorage DATABASE ThreadDB');
+    alasql('USE ThreadDB');
+    alasql('CREATE TABLE IF NOT EXISTS threads (oldThread string, oldMessages string)');
+    updateThreadsTable();
+});
+    </script>
+  </div>
+  <div id="Runs_tab" class="tabarea hide">
+    <img src="https://i.postimg.cc/QMzXdmg8/d2.jpg" alt="News Image 2">
+  </div>
+ </div>
+</center>
+
+    <script>
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        document.getElementById('messageForm').addEventListener('submit', function(event) {
+          event.preventDefault(); 
+          sleep(2000);
+          var azzie = document.getElementById('asstIDHolder').value;
+          var gege = document.getElementById('threadHolder').value;
+          var message = document.getElementById('messageInput').value;
+          document.getElementById('messageInput').value = ''; 
+          fetchOpenAIResponse(message, azzie, gege);
+       });
+
+document.getElementById('newThread').addEventListener('click', function() {
+    fetch('http://cannot.cyou/api/v1/thread/create', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log('New thread started:', data);
+        var oldThread = document.getElementById('threadHolder').value;
+        var sd = data.replace(/^"|"$/g, '');
+        var strippedData = sd.replace(/^"|"$/g, '');
+        document.getElementById('threadHolder').value = strippedData;
+        var om = document.getElementById('messages').innerHTML;
+        var oldMessages = htmlEncode(om);
+        document.getElementById('messages').innerHTML = '';
+        var tsave = [{ oldThread: oldThread, oldMessages: oldMessages }];
+
+        alasql('CREATE TABLE IF NOT EXISTS threads (oldThread string, oldMessages string)');
+        try {
+            alasql('INSERT INTO threads VALUES ?', tsave);
+            console.log('Saved to localStorage:', tsave);
+        } catch (error) {
+            console.error('Error saving to localStorage:', error);
+        }
+    //  Update the table in the Threads tab
+        updateThreadsTable();
+    })
+    .catch((error) => {
+        console.log('Error:', error);
+    });
+});
+
+
+const tabContainer = document.querySelector('.tab-container');
+const tabButtons = document.querySelectorAll('.tab');
+const tabAreas = document.querySelectorAll('.tabarea');
+
+tabContainer.addEventListener('click', (event) => {
+  if (event.target.classList.contains('tab')) {
+    tabButtons.forEach(tab => tab.classList.remove('selected'));
+    event.target.classList.add('selected');
+    loadandhide();
+  }
+})
+
+function loadandhide() {
+  var sel = document.querySelector('.selected').dataset.tabpage;
+  var selector = "#" + sel;
+  var targ = document.querySelector(selector);
+  var areas = [...document.querySelectorAll('.tabarea')]
+  areas.forEach( area => {
+    area.classList.contains('hide') ? console.log(area) : area.classList.add('hide') });
+  targ.classList.remove('hide');
+    }
+
+function displayAssistantData() {
+    fetch('http://www.cannot.cyou/api/v1/assistant/list', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!Array.isArray(data)) {
+            throw new Error('Data is not an array');
+        }
+
+        const tableBody = document.getElementById("assistantTable").getElementsByTagName("tbody")[0];
+        if (!tableBody) {
+            throw new Error('Table body not found');
+        }
+
+        data.forEach(assistant => {
+            const row = document.createElement("tr");
+
+            const idCell = document.createElement("td");
+            idCell.textContent = assistant.id;
+            row.appendChild(idCell);
+
+            const createdAtCell = document.createElement("td");
+            createdAtCell.textContent = new Date(assistant.created_at * 1000).toLocaleString();
+            row.appendChild(createdAtCell);
+
+            const descriptionCell = document.createElement("td");
+            descriptionCell.textContent = truncateText(assistant.description || "-", 50);
+            descriptionCell.addEventListener('click', () => toggleText(descriptionCell, assistant.description || "-"));
+            row.appendChild(descriptionCell);
+
+            const instructionsCell = document.createElement("td");
+            instructionsCell.textContent = truncateText(assistant.instructions || "-", 50);
+            instructionsCell.addEventListener('click', () => toggleText(instructionsCell, assistant.instructions || "-"));
+            row.appendChild(instructionsCell);
+
+            const modelCell = document.createElement("td");
+            modelCell.textContent = assistant.model || "-";
+            row.appendChild(modelCell);
+
+            const nameCell = document.createElement("td");
+            nameCell.textContent = assistant.name || "-";
+            row.appendChild(nameCell);
+
+            const toolsCell = document.createElement("td");
+            toolsCell.textContent = (assistant.tools && assistant.tools.map(tool => tool.type).join(", ")) || "-";
+            row.appendChild(toolsCell);
+
+            tableBody.appendChild(row);
+        });
+    })
+    .catch((error) => {
+        console.log('Error:', error);
+    });
+}
+
+function truncateText(text, length) {
+    return text.length > length ? text.slice(0, length) + '...' : text;
+}
+
+function toggleText(cell, fullText) {
+    const isTruncated = cell.textContent.endsWith('...');
+    cell.textContent = isTruncated ? fullText : truncateText(fullText, 50);
+}
+
+displayAssistantData()
+    </script>
+
+</body>
+</html>

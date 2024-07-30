@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewportl" content="width=device-width, initial-scale=1">
+<style>
+
+.chat-sent-root {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+            margin: 0 0 10px;
+        }
+
+        .chat-sent-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            margin-left: 30vw;
+            gap: 0.5rem;
+        }
+
+        .chat-sent-header {
+            display: flex;
+            flex-wrap: no-wrap;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 3rem;
+            width: 30vw;
+        }
+
+        .chat-sent-name {
+            font-weight: bold;
+            align-items: flex-end;
+            color: black;
+        }
+
+        .chat-sent-timestamp {
+            font-size: 0.875rem;
+            color: #999;
+        }
+
+        .chat-sent-message {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+            background-color: #00796b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            max-width: 576px;
+        }
+
+        .chat-received-root {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .chat-received-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-right: 30vw;
+        }
+
+        .chat-received-header {
+            display: flex;
+            flex-wrap: no wrap;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .chat-received-name {
+            font-weight: bold;
+            color: black;
+        }
+
+        .chat-received-timestamp {
+            font-size: 0.875rem;
+            color: #999;
+        }
+
+        .chat-received-image {
+            width: 100%;
+            height: auto;
+        }
+
+        .chat-received-message {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+            background-color: #f0f0f0;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            max-width: 576px;
+        }
+
+        .message-received-text {
+            color: black;
+        }
+
+        .flexboxrow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 90%;
+            margin-left: 10%;
+       }
+ 
+text-field{
+  flex: 1;
+}
+icon-button {
+  flex: 0;
+}
+
+@media screen and (max-width: 460px) {
+        .chat-sent-content {
+            margin-left: 0vw;
+        }
+          .chat-sent-header {
+            display: flex;
+            flex-wrap: no-wrap;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 3rem;
+            width: 80vw;
+        }
+          .chat-received-content {
+            margin-right: 0vw;
+        }
+}
+
+
+.teebs {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 6vh;
+  border: 2px solid #ccc;
+}
+.cont {
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  border: 1px solid #ccc;
+}
+.windy {
+  flex: 1 0;
+  padding: 1rem;
+  height: 90%;
+  border: 1px solid #ccc;
+  overflow-y: scroll;
+}
+.bottom-bar {
+  flex: 0;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+<div class="cont">
+  <div class="teebs">
+    <a href="/" class="navlink">Home</a>
+    <a href="/about" class="navlink">About</a>
+    <a href="/contact" class="navlink">Contact</a>
+  </div>
+  <div id="chatHolder" class="windy">
+    <div id="chat-sent" class="chat-sent-root"></div>
+    <div id="chat-received" class="chat-received-root"></div>
+    <div id="chat-sent2" class="chat-sent-root"></div>
+  </div>
+    <text-field
+        class="bottom-bar"
+        label="Your Name"
+        placeholder="Enter your name"
+        icon=""
+        icon-right=""
+        help-text="This is a required field."
+        error="false"
+        disabled="false"
+        variant="outline">
+    </text-field>
+
+</div>
+<script type="module">
+//import { IconButton } from './components/IconButton.js';
+
+        function createChatSentItem({ message, image=false }) {
+            const chatSentItem = document.createElement('div');
+            chatSentItem.classList.add('chat-sent-content');
+
+            const chatHeader = document.createElement('div');
+            chatHeader.classList.add('chat-sent-header');
+
+            
+            const nameElement = document.createElement('span');
+            nameElement.classList.add('chat-sent-name');
+            nameElement.textContent = 'User';
+            chatHeader.appendChild(nameElement);
+
+           const timestampElement = document.createElement('span');
+           timestampElement.classList.add('chat-sent-timestamp');
+           const now = new Date();
+           timestampElement.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+           chatHeader.appendChild(timestampElement);
+            
+            const chatMessage = document.createElement('div');
+            chatMessage.classList.add('chat-sent-message');
+
+            if (message) {
+                const messageElement = document.createElement('span');
+                messageElement.textContent = message;
+                chatMessage.appendChild(messageElement);
+            }
+          
+            if (image) {
+                const imgElement = document.createElement('img');
+                imgElement.src = image;
+                imgElement.alt = 'messageimage';
+                imgElement.classList.add("chat-received-image")
+                chatMessage.appendChild(imgElement);
+            }
+          
+            chatSentItem.appendChild(chatHeader);
+            chatSentItem.appendChild(chatMessage);
+
+            return chatSentItem;
+        }
+
+function newUserMessage(mess, image=false) {
+        const chatSentData = { message: mess, image: image };
+        const chatSent = document.getElementById('chatHolder');
+        const newSentHome = document.createElement('div');
+        newSentHome.classList.add("chat-sent-root");
+        const chatSentItem = createChatSentItem(chatSentData);
+        chatSent.appendChild(newSentHome);
+        newSentHome.appendChild(chatSentItem);
+}
+
+//newUserMessage(false, "https://i.postimg.cc/J4bMZP8T/cutouttt.png")
+
+//newUserMessage("This is a message.");
+
+//newUserMessage("lick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my butt");
+
+
+
+        function createChatReceiveItem({ message, image = false }) {
+            const chatReceiveItem = document.createElement('div');
+            chatReceiveItem.classList.add('chat-received-content');
+
+            const chatHeader = document.createElement('div');
+            chatHeader.classList.add('chat-received-header');
+
+            
+            const nameElement = document.createElement('span');
+            nameElement.classList.add('chat-received-name');
+            nameElement.textContent = 'Assistant';
+            chatHeader.appendChild(nameElement);
+
+           const timestampElement = document.createElement('span');
+           timestampElement.classList.add('chat-received-timestamp');
+           const now = new Date();
+           timestampElement.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+           chatHeader.appendChild(timestampElement);
+            
+            const chatMessage = document.createElement('div');
+            chatMessage.classList.add('chat-received-message');
+
+            if (image) {
+                const imgElement = document.createElement('img');
+                imgElement.src = image;
+                imgElement.alt = 'messageimage';
+                imgElement.classList.add("chat-received-image")
+                chatMessage.appendChild(imgElement);
+            }
+          
+            if (message) {
+                const messageElement = document.createElement('span');
+                messageElement.textContent = message;
+                chatMessage.appendChild(messageElement);
+           }
+
+            chatReceiveItem.appendChild(chatHeader);
+            chatReceiveItem.appendChild(chatMessage);
+
+            return chatReceiveItem;
+        }
+
+function newAssistantMessage(mess, image=false) {
+        const chatReceiveData = { message: mess, image: image };
+        const chatReceive = document.getElementById('chatHolder');
+        const newReceiveHome = document.createElement('div');
+        newReceiveHome.classList.add("chat-received-root");
+        const chatReceiveItem = createChatReceiveItem(chatReceiveData);
+        chatReceive.appendChild(newReceiveHome);
+        newReceiveHome.appendChild(chatReceiveItem);
+}
+
+//newAssistantMessage("lick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my buttlick on my butt");
+//newUserMessage("This is a message.");
+//newAssistantMessage(false, 'https://i.postimg.cc/VknFgPTy/cf1dcdfaf2e95e6b963c0f1ee3f455de.png');
+//newUserMessage("This is a message.");
+
+        class IconButton extends HTMLElement {
+            static get observedAttributes() {
+                return ['variant', 'size', 'icon', 'loading'];
+            }
+
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        .icon-button {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border: none;
+                            border-radius: 0.5rem;
+                            background-color: transparent;
+                            cursor: pointer;
+                            transition: background-color 0.2s ease;
+                        }
+
+                        .icon-button.small {
+                            height: 1.5rem;
+                            width: 1.5rem;
+                        }
+
+                        .icon-button.medium {
+                            height: 2rem;
+                            width: 2rem;
+                        }
+
+                        .icon-button.large {
+                            height: 2.7rem;
+                            width: 2.7rem;
+                        }
+
+                        .icon-button.inverse:hover {
+                            background-color: rgba(255, 255, 255, 0.16);
+                        }
+
+                        .icon-button.inverse:active {
+                            background-color: rgba(255, 255, 255, 0.24);
+                        }
+
+                        .icon-button.brand-primary {
+                            background-color: #00796b;
+                        }
+                        .icon-button.brand-white {
+                            background-color: white;
+                        }
+                        .icon-button.brand-primary:hover {
+                            background-color: #00695c;
+                        }
+
+                        .icon-button.brand-primary:active {
+                            background-color: #00796b;
+                        }
+
+                        .icon-button.brand-secondary {
+                            background-color: #80cbc4;
+                        }
+
+                        .icon-button.brand-secondary:hover {
+                            background-color: #4db6ac;
+                        }
+
+                        .icon-button.brand-secondary:active {
+                            background-color: #80cbc4;
+                        }
+
+                        .icon-button.brand-tertiary:hover {
+                            background-color: #e0f2f1;
+                        }
+
+                        .icon-button.brand-tertiary:active {
+                            background-color: #b2dfdb;
+                        }
+
+                        .icon-button.neutral-primary {
+                            background-color: #666;
+                        }
+
+                        .icon-button.neutral-primary:hover {
+                            background-color: #555;
+                        }
+
+                        .icon-button.neutral-primary:active {
+                            background-color: #666;
+                        }
+
+                        .icon-button.neutral-secondary {
+                            background-color: #f5f5f5;
+                            border: 1px solid #ddd;
+                        }
+
+                        .icon-button.neutral-secondary:hover {
+                            background-color: #eee;
+                        }
+
+                        .icon-button.neutral-secondary:active {
+                            background-color: #f5f5f5;
+                        }
+
+                        .icon-button.neutral-tertiary:hover {
+                            background-color: #f0f0f0;
+                        }
+
+                        .icon-button.neutral-tertiary:active {
+                            background-color: #e0e0e0;
+                        }
+
+                        .icon-button.destructive-primary {
+                            background-color: #d32f2f;
+                        }
+
+                        .icon-button.destructive-primary:hover {
+                            background-color: #c62828;
+                        }
+
+                        .icon-button.destructive-primary:active {
+                            background-color: #d32f2f;
+                        }
+
+                        .icon-button.destructive-secondary {
+                            background-color: #ef9a9a;
+                        }
+
+                        .icon-button.destructive-secondary:hover {
+                            background-color: #e57373;
+                        }
+
+                        .icon-button.destructive-secondary:active {
+                            background-color: #ef9a9a;
+                        }
+
+                        .icon-button.destructive-tertiary:hover {
+                            background-color: #ffebee;
+                        }
+
+                        .icon-button.destructive-tertiary:active {
+                            background-color: #ffcdd2;
+                        }
+
+                        .icon-button.disabled {
+                            cursor: default;
+                            background-color: #e0e0e0;
+                        }
+
+                        .icon-button.disabled:hover,
+                        .icon-button.disabled:active {
+                            cursor: default;
+                            background-color: #e0e0e0;
+                        }
+
+                        .icon {
+                            width: 100%;
+                            height: auto;
+                        }
+
+                        .icon.small {
+                            font-size: 14px;
+                            font-weight: 400;
+                            line-height: 14px;
+                        }
+
+                        .icon.large {
+                            width: 40px;
+                            height: 40px;
+                        }
+
+                        .icon.inverse {
+                            color: black;
+                        }
+
+                        .icon.destructive-tertiary,
+                        .icon.destructive-secondary {
+                            color: #d32f2f;
+                        }
+
+                        .icon.destructive-primary,
+                        .icon.neutral-primary,
+                        .icon.brand-primary {
+                            color: black;
+                        }
+
+                        .icon.brand-tertiary,
+                        .icon.brand-secondary {
+                            color: #00796b;
+                        }
+
+                        .loader {
+                            display: none;
+                            font-size: 16px;
+                            font-weight: 400;
+                            line-height: 16px;
+                            color: #999;
+                        }
+
+                        .loader.loading {
+                            display: inline-block;
+                            color: #00796b;
+                        }
+                    </style>
+                    <button id="button" class="icon-button">
+                        <span id="icon" class=></span> 
+                        <img id="iconic" src="" alt="picicon">
+                        <span id="loader" class="loader">Loading...</span>
+                    </button>
+                `;
+            }
+
+            connectedCallback() {
+                this.updateButton();
+            }
+
+            attributeChangedCallback(name, oldValue, newValue) {
+                this.updateButton();
+            }
+
+            updateButton() {
+                const button = this.shadowRoot.getElementById('button');
+                const icon = this.shadowRoot.getElementById('icon');
+                console.log(icon)
+                const iconic = this.shadowRoot.getElementById('iconic');
+                console.log(iconic)
+                const loader = this.shadowRoot.getElementById('loader');
+                
+                const variant = this.getAttribute('variant');
+                const size = this.getAttribute('size');
+                const iconContent = this.getAttribute('icon');
+                console.log(iconContent)
+                const imgContent = this.getAttribute('iconic');
+                console.log(imgContent)
+                const loading = this.getAttribute('loading') === 'true';
+
+                button.className = `icon-button ${size} ${variant}`;
+                button.disabled = loading;
+                if (iconContent != "false") {
+                  icon.textContent = iconContent;
+                  icon.className = `icon ${size} ${variant}`;
+                  iconic.style.display = "none"
+                }
+              
+                if (imgContent != "false") {
+                  iconic.src = imgContent;
+                  iconic.className = `icon ${variant}`;
+                  icon.style.display = "none"
+                }
+
+                loader.className = `loader ${loading ? 'loading' : ''}`;
+            }
+        }
+
+        customElements.define('icon-button', IconButton);
+
+
+        class TextField extends HTMLElement {
+            static get observedAttributes() {
+                return ['label', 'placeholder', 'icon', 'icon-right', 'help-text', 'error', 'disabled', 'variant'];
+            }
+
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+                this.eventConfig = {
+                  'userSendButton': { 
+                    event: 'click', 
+                    handler: this.userSubmitMessage.bind(this)
+                  },
+                  "pclip": {
+                    event: "click",
+                    handler: this.alerting.bind(this)
+                  }
+
+                };
+                this.render();
+                
+            }
+
+            
+
+            connectedCallback() {
+                
+                this.updateTextField();
+                
+                this.bindEvents();
+            }
+            disconnectedCallback() {
+                this.unbindEvents();
+            }
+
+            attributeChangedCallback(name, oldValue, newValue) {
+                this.updateTextField();
+            }
+            bindEvents() {
+              Object.keys(this.eventConfig).forEach(id => {
+                const { event, handler } = this.eventConfig[id];
+                const element = this.shadowRoot.getElementById(id);
+                if (element) {
+                  element.addEventListener(event, handler);
+                }
+              });
+            }
+
+            unbindEvents() {
+              Object.keys(this.eventConfig).forEach(id => {
+                const { event, handler } = this.eventConfig[id];
+                const element = this.shadowRoot.getElementById(id);
+                if (element) {
+                  element.removeEventListener(event, handler);
+                }
+              });
+            }
+            render() {
+              this.shadowRoot.innerHTML = `
+                    <style>
+                        * {
+                          box-sizing: border-box;
+                        }
+                        .text-field-root {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 0.5rem;
+                            width: 90%;
+                        }
+                        .text-field-row {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            width: 90%;
+                            margin-left: 10%;
+                        }
+                        .text-field-label {
+                            font-weight: bold;
+                            color: black;
+                            width: 90%;
+                            margin-left: 10%;
+                        }
+
+                        .text-field-container {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                            width: 100%;
+                            height: 2rem;
+                            padding: 0 0.5rem;
+                            border: 1px solid #ddd;
+                            border-radius: 0.5rem;
+                            background-color: #fff;
+                        }
+
+                        .text-field-container.filled {
+                            border: 1px solid #ddd;
+                            background-color: #f5f5f5;
+                        }
+
+                        .text-field-container.error {
+                            border: 1px solid #d32f2f;
+                        }
+
+                        .text-field-container.disabled {
+                            border: 1px solid #ddd;
+                            background-color: #f5f5f5;
+                        }
+
+                        .text-field-container:focus-within {
+                            border: 1px solid #00796b;
+                        }
+
+                        .text-field-input {
+                            flex-grow: 1;
+                            border: none;
+                            background-color: transparent;
+                            outline: none;
+                            font-size: 1rem;
+                            color: black;
+                        }
+
+                        .text-field-icon {
+                            border: 0px solid white;
+                            background-color: white;
+                            color: white;
+                            font-size: 30px;
+                            cursor: pointer;
+                        }
+
+                        .text-field-icon.error {
+                            color: #d32f2f;
+                        }
+
+                        .text-field-help-text {
+                            opacity: 0;
+                            font-size: 0.875rem;
+                            color: #999;
+                        }
+
+                        .text-field-help-text.error {
+                            color: #d32f2f;
+                        }
+                    </style>
+                    <label class="text-field-root">
+                        <span class="text-field-label"></span>
+                        
+                        <div class="text-field-row">
+                        <icon-button id="pclip" variant="brand-white" size="medium" iconic="https://i.postimg.cc/cCGmhN2v/paperclip.png" icon="false" loading="false"></icon-button>
+                          <div class="text-field-container">
+                            <span id="iconleft" class="text-field-icon"></span>
+                            <input id="userSendInput" class="text-field-input" type="text">
+                            <span id="iconright" class="text-field-icon"></span>
+                          </div>
+                          <button id="userSendButton" class="text-field-icon"></button>
+                        </div>
+                     
+           
+                    </label>
+                `;
+            }
+            updateTextField() {
+                const textFieldRoot = this.shadowRoot.querySelector('.text-field-root');
+                const textFieldLabel = this.shadowRoot.querySelector('.text-field-label');
+                const textFieldContainer = this.shadowRoot.querySelector('.text-field-container');
+                const textFieldRow = this.shadowRoot.querySelector('.text-field-row');
+                const textFieldInput = this.shadowRoot.querySelector('.text-field-input');
+                //const textFieldIconLeft = textFieldRow.children[0];
+                const textFieldIconRight = this.shadowRoot.querySelector('#iconright');
+                const textFieldButton = textFieldRow.children[2];
+                const textFieldHelpText = this.shadowRoot.querySelector('.text-field-help-text');
+
+                const label = this.getAttribute('label');
+                const placeholder = this.getAttribute('placeholder');
+                const icon = this.getAttribute('icon');
+                const iconRight = this.getAttribute('icon-right');
+                const helpText = this.getAttribute('help-text');
+                const error = this.getAttribute('error') === 'true';
+                const disabled = this.getAttribute('disabled') === 'true';
+                const variant = this.getAttribute('variant');
+
+                textFieldLabel.textContent = label;
+                textFieldInput.placeholder = placeholder;
+                //textFieldIconLeft.textContent = icon;
+                textFieldButton.textContent = '⬆️';
+                textFieldIconRight.textContent = iconRight;
+      
+
+                textFieldContainer.className = `text-field-container ${variant} ${error ? 'error' : ''} ${disabled ? 'disabled' : ''}`;
+                textFieldIconRight.className = `text-field-icon ${error ? 'error' : ''}`;
+
+                textFieldInput.disabled = disabled;
+            }
+            userSubmitMessage() {
+              const subValue = this.shadowRoot.querySelector('#userSendInput').value;
+              this.shadowRoot.querySelector('#userSendInput').value = "";
+              const event = new CustomEvent('myCustomEvent', {
+                detail: {message: subValue},
+                bubbles: true
+              });
+              document.body.dispatchEvent(event);
+            };
+          
+          alerting() {
+            alert('SKIMP');
+          }
+          
+        }
+
+        customElements.define('text-field', TextField);
+
+
+document.body.addEventListener('myCustomEvent', function(event) {
+  newUserMessage(event.detail.message);
+});
+
+
+function $(tag){ return document.querySelector(tag) };
+var wind = $('#chatHolder'); 
+wind.scrollTo(0, wind.scrollHeight);
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,80 @@
+.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+
+#prepre {
+  opacity: 0;
+}
+
+.username {
+  color: red;
+}
+
+.regtext {
+  color: black;
+}
+
+#messages {
+  padding: 15px;
+  width: 82%;
+  overflow: auto;  
+  line-height: 1.5em;
+  border: 1px solid white;
+  word-wrap: break-word;  
+  white-space: normal;  
+}
+      
+#status {
+  min-height: 50px;
+  width: 100%;      
+  transition: opacity 1s ease-out; 
+}
+
+.flash {
+    animation: flash 0.5s;
+} 
+
+@keyframes flash {
+    0% { background-color: yellow; }
+    100% { background-color: transparent; }
+}
+
+.ilene {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+}
+/*
+.ilene > * {
+    margin-right: 10px;  
+}
+ */
+#newThread {
+    display: none;
+}
+
+.asstcontainer {
+  width: 75%;
+  height: auto;
+}
+
+.multi-line {
+   width: 42%; 
+   height: 50px; 
+   overflow: hidden;
+   display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-height: 1.5em; 
+   border: 1px solid #000; 
+}
+#messageForm{display: flex;}
+#messageInput {
+  flex: 1 0;
+}
